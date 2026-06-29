@@ -110,8 +110,11 @@
         status.textContent = "Buscando hora...";
         frase.textContent = "";
 
+
+
+
         try {
-          let url = URL_DO_WORKER + "/hora";
+          let url = URL_DO_WORKER + "hora";
 
           if (nome !== "") {
             url += "?nome=" + encodeURIComponent(nome);
@@ -145,8 +148,12 @@
         status.textContent = "Sorteando número...";
         frase.textContent = "";
 
+
+
+
+
         try {
-          const resposta = await fetch(URL_DO_WORKER + "/sorteio");
+          const resposta = await fetch(URL_DO_WORKER + "sorteio");
 
           if (!resposta.ok) {
             throw new Error("Erro " + resposta.status);
