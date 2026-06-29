@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Olá, Nuvem</title>
+
     <style>
       body {
         margin: 0;
@@ -14,21 +15,44 @@
         background: #0f172a;
         color: #f8fafc;
       }
+
       main {
         text-align: center;
         padding: 30px;
         max-width: 520px;
       }
+
       h1 {
         font-size: 42px;
         margin: 0 0 10px;
       }
+
       #status {
         font-size: 18px;
         color: #cbd5e1;
         min-height: 54px;
         line-height: 1.5;
       }
+
+      #frase {
+        margin-top: 18px;
+        font-size: 17px;
+        color: #bae6fd;
+        font-style: italic;
+        min-height: 40px;
+      }
+
+      input {
+        margin-top: 18px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: none;
+        font-size: 15px;
+        width: 100%;
+        max-width: 300px;
+        box-sizing: border-box;
+      }
+
       button {
         margin-top: 18px;
         background: #38bdf8;
@@ -40,39 +64,59 @@
         font-weight: 600;
         cursor: pointer;
       }
+
       button:hover {
         background: #7dd3fc;
       }
     </style>
   </head>
+
   <body>
     <main>
       <h1>Olá, Nuvem</h1>
+
+      <input id="nome" type="text" placeholder="Digite seu nome" />
+
       <p id="status">Carregando a resposta do servidor...</p>
+
+      <p id="frase"></p>
+
       <button id="btn">Buscar de novo</button>
     </main>
 
     <script>
-      // PASSO DO MOVIMENTO 4:
-      // Troque o texto abaixo pela URL do SEU Worker (termina em .workers.dev).
       const URL_DO_WORKER = "https://projeto-cloud777.bruno-maciel77777.workers.dev/";
 
       async function buscar() {
-
         const status = document.getElementById("status");
+        const frase = document.getElementById("frase");
+        const nome = document.getElementById("nome").value.trim();
+
         status.textContent = "Buscando...";
+        frase.textContent = "";
+
         try {
-          const resposta = await fetch(URL_DO_WORKER);
+          let url = URL_DO_WORKER;
+
+          if (nome !== "") {
+            url += "?nome=" + encodeURIComponent(nome);
+          }
+
+          const resposta = await fetch(url);
           const dados = await resposta.json();
+
           status.textContent =
             dados.mensagem + " Hora do servidor: " + dados.horaDoServidor;
+
+          frase.textContent = dados.fraseDoDia;
         } catch (erro) {
-          status.textContent =
-            "Não consegui falar com o Worker. Confira a URL.";
+          status.textContent = "Não consegui falar com o Worker. Confira a URL.";
+          frase.textContent = "";
         }
       }
 
       document.getElementById("btn").addEventListener("click", buscar);
+
       buscar();
     </script>
   </body>
