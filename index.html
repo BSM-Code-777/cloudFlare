@@ -100,6 +100,8 @@
 
       <p id="frase"></p>
 
+      <p id="visitas"></p>
+
       <div class="botoes">
         <button id="btnHora">Buscar hora</button>
         <button id="btnSorteio">Sortear número</button>
@@ -114,12 +116,13 @@
 
         const status = document.getElementById("status");
         const frase = document.getElementById("frase");
-        const nome = document.getElementById("nome").value.trim(); // pega o que a pessoa digitou no input.
         const visitas = document.getElementById("visitas");
+        const nome = document.getElementById("nome").value.trim(); // pega o que a pessoa digitou no input.
 
         status.classList.remove("erro"); // Remove a classe erro do status. // voltar à cor normal antes de tentar buscar.
         status.textContent = "Buscando hora..."; // texto da tela para avisar que está buscando.
         frase.textContent = ""; // Limpa a frase antiga.
+        visitas.textContent = "";
 
 
         try { // área de tentativa. // Tente fazer isso
