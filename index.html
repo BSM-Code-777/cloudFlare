@@ -42,6 +42,14 @@
         min-height: 40px;
       }
 
+      #visitas {
+        margin-top: 14px;
+        font-size: 16px;
+        color: #e0f2fe;
+        font-weight: 600;
+        min-height: 24px;
+      }
+
       input {
         margin-top: 18px;
         padding: 12px 14px;
@@ -99,82 +107,93 @@
     </main>
 
     <script>
-      const URL_DO_WORKER = "https://projeto-cloud777.bruno-maciel77777.workers.dev";
 
-      async function buscarHora() {
+      const URL_DO_WORKER = "https://projeto-cloud777.bruno-maciel77777.workers.dev";  // URL base do Worker. // endereço do seu backend.
+
+      async function buscarHora() { // função buscarHora // async significa que ela pode esperar a resposta do servidor.
+
         const status = document.getElementById("status");
         const frase = document.getElementById("frase");
-        const nome = document.getElementById("nome").value.trim();
+        const nome = document.getElementById("nome").value.trim(); // pega o que a pessoa digitou no input.
+        const visitas = document.getElementById("visitas");
 
-        status.classList.remove("erro");
-        status.textContent = "Buscando hora...";
-        frase.textContent = "";
+        status.classList.remove("erro"); // Remove a classe erro do status. // voltar à cor normal antes de tentar buscar.
+        status.textContent = "Buscando hora..."; // texto da tela para avisar que está buscando.
+        frase.textContent = ""; // Limpa a frase antiga.
 
 
+        try { // área de tentativa. // Tente fazer isso
 
+          let url = URL_DO_WORKER + "/hora"; // Monta a URL da rota /hora
 
-        try {
-          let url = URL_DO_WORKER + "/hora";
-
-          if (nome !== "") {
-            url += "?nome=" + encodeURIComponent(nome);
+          if (nome !== "") { // se o nome diferente de vazio entra nesse bloco
+            url += "?nome=" + encodeURIComponent(nome); // encodeURIComponent(nome) prepara o texto para ir na URL com segurança.
           }
 
-          const resposta = await fetch(url);
+          const resposta = await fetch(url); // Aqui a página chama o Worker. // fetch(url) faz o pedido para o backend. // await - espera a resposta antes de continuar
 
-          if (!resposta.ok) {
-            throw new Error("Erro " + resposta.status);
+          if (!resposta.ok) { // O ! significa “não”.// Então essa linha quer dizer:“Se a resposta não estiver ok...”// verifica se a resposta deu certo, é verdadeiro quando o status é tipo 200.
+            throw new Error("Erro " + resposta.status); // aqui e a criação de um erro manual // Quando usamos throw, o código pula para o catch.
           }
 
-          const dados = await resposta.json();
+          const dados = await resposta.json(); // transformamos a resposta JSON em objeto JavaScript.
 
-          status.textContent =
-            dados.mensagem + " Hora do servidor: " + dados.horaDoServidor;
+          status.textContent = dados.mensagem + " Hora do servidor: " + dados.horaDoServidor; // Aqui colocamos na tela a mensagem e a hora.
 
-          frase.textContent = dados.fraseDoDia;
-        } catch (erro) {
-          status.classList.add("erro");
-          status.textContent =
-            "Não consegui buscar a hora. Confira se a rota /hora existe no Worker.";
-          frase.textContent = "";
+          frase.textContent = dados.fraseDoDia; // mostramos a frase do dia na página
+          visitas.textContent = "Você é a visita número " + dados.totalDeVisitas + ".";
+
+        } catch (erro) {  // Se algo der errado dentro do try, o código vem para cá.
+
+          status.classList.add("erro"); // Adiciona a classe erro. // Isso muda a cor do texto para vermelho claro.
+          status.textContent = "Não consegui buscar a hora. Confira se a rota /hora existe no Worker.";  // Mostra uma mensagem amigável para o usuário. // Em vez de quebrar a página, ela explica o problema.
+          frase.textContent = ""; // Limpa a frase.
+          visitas.textContent = "";
+
         }
       }
 
-      async function buscarSorteio() {
-        const status = document.getElementById("status");
-        const frase = document.getElementById("frase");
 
-        status.classList.remove("erro");
-        status.textContent = "Sorteando número...";
-        frase.textContent = "";
+      async function buscarSorteio() { // Cria a função que será chamada pelo botão Sortear número.
+
+        const status = document.getElementById("status");  // Pega o parágrafo do status.
+        const frase = document.getElementById("frase"); // Pega o parágrafo da frase.
+        const visitas = document.getElementById("visitas");
+
+        status.classList.remove("erro"); // Remove a cor de erro, caso ela esteja ativa.
+        status.textContent = "Sorteando número..."; // Mostra que está carregando o sorteio.
+        frase.textContent = ""; // Limpa a frase anterior.
+        visitas.textContent = "";
 
 
 
 
 
-        try {
-          const resposta = await fetch(URL_DO_WORKER + "/sorteio");
+        try { // Começa a tentativa.
 
-          if (!resposta.ok) {
-            throw new Error("Erro " + resposta.status);
+          const resposta = await fetch(URL_DO_WORKER + "/sorteio"); // Chama a rota /sorteio do Worker.
+
+          if (!resposta.ok) { // Verifica se a resposta não deu certo.
+            throw new Error("Erro " + resposta.status); // Se não deu certo, cria um erro e pula para o catch.
           }
 
-          const dados = await resposta.json();
+          const dados = await resposta.json(); // Transforma o JSON recebido em objeto JavaScript.
 
-          status.textContent = "Número sorteado: " + dados.numeroSorteado;
-          frase.textContent = dados.fraseDoDia;
-        } catch (erro) {
-          status.classList.add("erro");
-          status.textContent =
-            "Não consegui sortear o número. Confira se a rota /sorteio existe no Worker.";
-          frase.textContent = "";
+          status.textContent = "Número sorteado: " + dados.numeroSorteado; // Mostra o número sorteado na tela.
+          frase.textContent = dados.fraseDoDia; // Mostra a frase do dia.
+          visitas.textContent = "Você é a visita número " + dados.totalDeVisitas + ".";
+
+        } catch (erro) { // Se der problema, entra aqui.
+
+          status.classList.add("erro"); // Coloca a cor de erro no texto.
+          status.textContent = "Não consegui sortear o número. Confira se a rota /sorteio existe no Worker."; // Mostra uma mensagem de erro amigável.
+          frase.textContent = ""; // Limpa a frase.
+          visitas.textContent = "";
         }
       }
 
-      document.getElementById("btnHora").addEventListener("click", buscarHora);
-      document
-        .getElementById("btnSorteio")
-        .addEventListener("click", buscarSorteio);
+      document.getElementById("btnHora").addEventListener("click", buscarHora); // QUANDO CLICAR NO BOTAO ELE ACIONA A FUNÇÃO "buscarHora"
+      document.getElementById("btnSorteio").addEventListener("click", buscarSorteio); // QUANDO CLICAR NO BOTAO ELE ACIONA A FUNÇÃO "buscarSorteio"
     </script>
   </body>
 </html>
